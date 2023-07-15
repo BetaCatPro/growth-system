@@ -1,0 +1,10 @@
+---
+kind: reverse
+name: growth
+source:
+  database: mysql
+  conn_str: 'root:root@tcp(localhost:3306)/growth?charset=utf8'
+targets:
+- type: codes
+  language: golang
+  output_dir: ../models/growth/
