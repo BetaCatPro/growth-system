@@ -1,23 +1,37 @@
 package main
 
 import (
-	"growth/initialize"
-	"growth/pb"
 	"net"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 
+	"growth/conf"
+	"growth/dbhelper"
 	"growth/handle"
+	"growth/initialize"
+	"growth/pb"
 )
 
-func main() {
+func initConf() {
+	// default UTC time location
+	time.Local = time.UTC
+	// Load global config
+	conf.LoadConfigs()
+	// Initialize Logger
 	initialize.InitLogger()
+	// Initialize db
+	dbhelper.InitDb()
+}
+
+func main() {
+	initConf()
 
 	lis, err := net.Listen("tcp", ":80")
 	if err != nil {

@@ -53,16 +53,35 @@ func main() {
 	} else {
 		zap.S().Errorf("connection nil")
 	}
-	// 请求服务
+
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
-	// 新建客户端
 	cCoin := pb.NewUserCoinClient(conn)
+	cGrade := pb.NewUserGradeClient(conn)
+
 	// 测试1：UserCoinServer.ListTasks
 	r1, err1 := cCoin.ListTasks(ctx, &pb.ListTasksRequest{})
 	if err1 != nil {
 		zap.S().Infof("cCoin.ListTasks error=%v\n", err1)
 	} else {
 		zap.S().Infof("cCoin.ListTasks: %+v\n", r1.GetDatalist())
+	}
+	// 测试2：UserGradeServer.ListGrades
+	r2, err2 := cGrade.ListGrades(ctx, &pb.ListGradesRequest{})
+	if err2 != nil {
+		zap.S().Infof("cGrade.ListGrades error=%v\n", err2)
+	} else {
+		zap.S().Infof("cGrade.ListGrades: %+v\n", r2.GetDatalist())
+	}
+	// 测试3：修改积分
+	r3, err3 := cCoin.UserCoinChange(ctx, &pb.UserCoinChangeRequest{
+		Uid:  0,
+		Task: "abc",
+		Coin: 0,
+	})
+	if err3 != nil {
+		zap.S().Infof("cCoin.UserCoinChange error=%v\n", err3)
+	} else {
+		zap.S().Infof("cCoin.UserCoinChange: %+v\n", r3.GetUser())
 	}
 }
