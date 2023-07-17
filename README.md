@@ -137,8 +137,6 @@ docker push growthsystem:v1.0
 
 # K8S 配置部署
 
-## 创建部署和服务
-
 ## 拉取镜像(work节点)
 
 ```bash
@@ -149,23 +147,23 @@ docker pull growthsystem:v1.0
 ## 创建deployment(master节点)
 
 ```bash
-# -- 查看帮助 kubectl create deployment --help
+# 查看帮助 kubectl create deployment --help
 kubectl create namespace k8stest
 kubectl create deployment -n k8stest growthsystem --image=/k8stest/growthsystem:v1.0 --replicas=1
 ```
 ## 创建service(master节点)
 
 ```bash
-# -- 查看帮助
+# 查看帮助
 kubectl create service --help
-# -- 创建指定namespace的服务
+# 创建指定namespace的服务
 # 将容器内的80端口暴露为80端口对外提供服务
 kubectl create service clusterip -n k8stest growthsystem --tcp=80:80
 kubectl create service clusterip -n k8stest growthsystem --tcp=8080:8080
 kubectl create service clusterip -n k8stest growthsystem --tcp=8081:8081
-# -- 删除一个service
+# 删除一个service
 kubectl delete service -n k8stest growthsystem
-# -- 将一个deployment暴露为service:
+# 将一个deployment暴露为service:
 kubectl expose deployment -n k8stest growthsystem --port=80 --target-port=80 --cluster-ip=
 kubectl get svc -A -o wide
 ```
