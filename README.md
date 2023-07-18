@@ -90,6 +90,7 @@ curl "localhost:8080/metrics"
 ```
 
 # 构建部署
+
 在项目根目录下
 
 ## 构建 growth-system 服务程序
@@ -151,6 +152,7 @@ docker pull growthsystem:v1.0
 kubectl create namespace k8stest
 kubectl create deployment -n k8stest growthsystem --image=/k8stest/growthsystem:v1.0 --replicas=1
 ```
+
 ## 创建service(master节点)
 
 ```bash
@@ -190,4 +192,71 @@ docker exec -it container_id /bin/bash
 ./growthclient --addr=growthsystem:80
 # service域名
 ./growthclient --addr=growthsystem.k8stest.svc.cluster.local:80
+```
+
+# 使用 helm 工具
+
+Linux安装
+
+```bash
+curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+chmod 700 get_helm.sh
+./get_helm.sh
+# 安装 kubectl
+yum install -y kubectl
+```
+
+安装后的验证
+
+```bash
+helm version
+helm help
+
+# 创建一个新的 chart
+helm create growth
+helm package growth 
+helm template growth-0.1.0.tgz
+```
+
+用 Helm 安装升级、卸载应用
+
+```bash
+helm install growth growth/
+helm uninstall growth
+```
+
+## 修改摸板
+
+```bash
+# 新增文件 templates/namespace.yaml
+
+# templates/deployment.yaml
+# 增加
+metadata.namespace: {{ .Values.namespace }}
+
+# 健康检查改为端口监听
+livenessProbe.tcpSocket.port: {{ .Values.service.port }}
+
+# 健康检查改为端口监听
+readinessProbe.tcpSocket.port: {{ .Values.service.port }}
+
+# templates/service.yaml
+# 增加
+metadata.namespace: {{ .Values.namespace }}
+
+# templates/serviceaccount.yaml
+# 增加命名空间
+metadata.namespace: {{ .Values.namespace }}
+
+# values.yaml
+# 设置镜像的地址
+image.repository: /k8stest/growth
+
+# 设置镜像的版本
+image.tag: "v3.0"
+
+# 设置拉取镜像的密钥
+imagePullSecrets: [{"name":"qcloudregistrykey"}]
+# 增加命名空间
+namespace: "k8stest"
 ```
